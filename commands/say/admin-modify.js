@@ -175,7 +175,7 @@ module.exports = {
 
     if (focusedOption.name !== 'persona') return;
 
-    const { listPersonas } = require('../utils/personaManager');
+    const { listPersonas } = require('../../utils/personaManager');
     const focused = focusedOption.value;
 
     const personas = listPersonas(interaction.guild.id);

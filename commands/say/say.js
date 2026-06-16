@@ -105,7 +105,7 @@ module.exports = {
 
     if (focusedOption.name !== 'persona') return;
 
-    const { listPersonas, isAllowed } = require('../utils/personaManager');
+    const { listPersonas, isAllowed } = require('../../utils/personaManager');
     const memberRoles = interaction.member.roles.cache.map((r) => r.id);
     const focused = focusedOption.value;
 

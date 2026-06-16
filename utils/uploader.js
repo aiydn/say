@@ -5,16 +5,15 @@ const path = require('path');
 const https = require('https');
 const http = require('http');
 
-const API_URL = 'https://catbox.moe/user/api.php';
+const API_URL = 'https://0x0.st';
 
 /**
- * Upload a local file to Catbox.
- * Returns the catbox URL, e.g. "https://files.catbox.moe/abc123.png"
+ * Upload a local file to 0x0.st.
+ * Returns the URL, e.g. "https://0x0.st/HF9Z.png"
  */
 async function uploadFile(filePath) {
   const form = new FormData();
-  form.append('reqtype', 'fileupload');
-  form.append('fileToUpload', fs.createReadStream(filePath));
+  form.append('file', fs.createReadStream(filePath));
 
   const res = await fetch(API_URL, {
     method: 'POST',
@@ -28,16 +27,15 @@ async function uploadFile(filePath) {
     return text.trim();
   }
 
-  throw new Error(`Catbox upload failed: ${text.trim()}`);
+  throw new Error(`0x0.st upload failed: ${text.trim()}`);
 }
 
 /**
- * Upload a URL to Catbox (Catbox re-hosts the file).
- * Returns the catbox URL.
+ * Upload a URL to 0x0.st (0x0 re-hosts the file).
+ * Returns the URL.
  */
 async function uploadURL(url) {
   const form = new FormData();
-  form.append('reqtype', 'urlupload');
   form.append('url', url);
 
   const res = await fetch(API_URL, {
@@ -52,12 +50,12 @@ async function uploadURL(url) {
     return text.trim();
   }
 
-  throw new Error(`Catbox URL upload failed: ${text.trim()}`);
+  throw new Error(`0x0.st URL upload failed: ${text.trim()}`);
 }
 
 /**
- * Download a Discord attachment to a temp file, then upload to Catbox.
- * Returns the catbox URL.
+ * Download a Discord attachment to a temp file, then upload to 0x0.st.
+ * Returns the URL.
  */
 async function uploadFromDiscord(attachmentUrl) {
   const dataDir = path.join(__dirname, '..', 'data');
@@ -87,17 +85,17 @@ async function uploadFromDiscord(attachmentUrl) {
     doRequest(attachmentUrl);
   });
 
-  // Upload to Catbox via file upload
-  let catboxUrl;
+  // Upload to 0x0.st
+  let fileUrl;
   try {
-    catboxUrl = await uploadFile(tempPath);
+    fileUrl = await uploadFile(tempPath);
   } finally {
     if (fs.existsSync(tempPath)) {
       fs.unlinkSync(tempPath);
     }
   }
 
-  return catboxUrl;
+  return fileUrl;
 }
 
 module.exports = { uploadFile, uploadURL, uploadFromDiscord };

@@ -4,16 +4,20 @@ const fs = require('fs');
 const path = require('path');
 const https = require('https');
 const http = require('http');
+const config = require('../config.json');
 
-const API_URL = 'https://0x0.st';
+const API_URL = 'https://freeimage.host/api/1/upload';
 
 /**
- * Upload a local file to 0x0.st.
- * Returns the URL, e.g. "https://0x0.st/HF9Z.png"
+ * Upload a local file to freeimage.host.
+ * Returns the direct image URL.
  */
 async function uploadFile(filePath) {
   const form = new FormData();
-  form.append('file', fs.createReadStream(filePath));
+  form.append('key', config.freeimageApiKey);
+  form.append('action', 'upload');
+  form.append('source', fs.createReadStream(filePath));
+  form.append('format', 'json');
 
   const res = await fetch(API_URL, {
     method: 'POST',
@@ -21,22 +25,25 @@ async function uploadFile(filePath) {
     headers: form.getHeaders(),
   });
 
-  const text = await res.text();
+  const json = await res.json();
 
-  if (res.ok && text.trim().startsWith('https://')) {
-    return text.trim();
+  if (json.status_code === 200) {
+    return json.image.url; // direct link to the image
   }
 
-  throw new Error(`0x0.st upload failed: ${text.trim()}`);
+  throw new Error(`freeimage.host upload failed: ${json.error?.message || JSON.stringify(json)}`);
 }
 
 /**
- * Upload a URL to 0x0.st (0x0 re-hosts the file).
- * Returns the URL.
+ * Upload a base64 string to freeimage.host.
+ * Returns the direct image URL.
  */
-async function uploadURL(url) {
+async function uploadBase64(base64String) {
   const form = new FormData();
-  form.append('url', url);
+  form.append('key', config.freeimageApiKey);
+  form.append('action', 'upload');
+  form.append('source', base64String);
+  form.append('format', 'json');
 
   const res = await fetch(API_URL, {
     method: 'POST',
@@ -44,18 +51,18 @@ async function uploadURL(url) {
     headers: form.getHeaders(),
   });
 
-  const text = await res.text();
+  const json = await res.json();
 
-  if (res.ok && text.trim().startsWith('https://')) {
-    return text.trim();
+  if (json.status_code === 200) {
+    return json.image.url;
   }
 
-  throw new Error(`0x0.st URL upload failed: ${text.trim()}`);
+  throw new Error(`freeimage.host upload failed: ${json.error?.message || JSON.stringify(json)}`);
 }
 
 /**
- * Download a Discord attachment to a temp file, then upload to 0x0.st.
- * Returns the URL.
+ * Download a Discord attachment to a temp file, then upload to freeimage.host.
+ * Returns the direct image URL.
  */
 async function uploadFromDiscord(attachmentUrl) {
   const dataDir = path.join(__dirname, '..', 'data');
@@ -85,17 +92,17 @@ async function uploadFromDiscord(attachmentUrl) {
     doRequest(attachmentUrl);
   });
 
-  // Upload to 0x0.st
-  let fileUrl;
+  // Upload to freeimage.host
+  let imageUrl;
   try {
-    fileUrl = await uploadFile(tempPath);
+    imageUrl = await uploadFile(tempPath);
   } finally {
     if (fs.existsSync(tempPath)) {
       fs.unlinkSync(tempPath);
     }
   }
 
-  return fileUrl;
+  return imageUrl;
 }
 
-module.exports = { uploadFile, uploadURL, uploadFromDiscord };
+module.exports = { uploadFile, uploadBase64, uploadFromDiscord };

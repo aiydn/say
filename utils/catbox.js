@@ -1,20 +1,8 @@
 const { Catbox } = require('node-catbox');
-const https = require('https');
-const http = require('http');
 const fs = require('fs');
 const path = require('path');
 
 const catbox = new Catbox();
-
-/**
- * Upload a file from a URL to Catbox (Catbox re-hosts it).
- * This is the simplest approach — Catbox downloads it directly.
- * Returns the catbox URL, e.g. "https://files.catbox.moe/abc123.png"
- */
-async function uploadFromURL(url) {
-  const response = await catbox.uploadURL({ url });
-  return response;
-}
 
 /**
  * Upload a local file to Catbox.
@@ -27,19 +15,9 @@ async function uploadFile(filePath) {
 
 /**
  * Download a Discord attachment to a temp file, then upload to Catbox.
- * Falls back to uploadURL if file upload fails.
  * Returns the catbox URL.
  */
 async function uploadFromDiscord(attachmentUrl) {
-  // Try the URL method first — Catbox downloads it itself, no temp file needed
-  try {
-    const url = await uploadFromURL(attachmentUrl);
-    return url;
-  } catch (error) {
-    console.log('URL upload failed, trying file upload fallback:', error.message);
-  }
-
-  // Fallback: download to temp file then upload
   const dataDir = path.join(__dirname, '..', 'data');
   if (!fs.existsSync(dataDir)) {
     fs.mkdirSync(dataDir, { recursive: true });
@@ -47,25 +25,25 @@ async function uploadFromDiscord(attachmentUrl) {
 
   const tempPath = path.join(dataDir, `temp_${Date.now()}`);
 
-  await new Promise((resolve, reject) => {
-    const client = attachmentUrl.startsWith('https') ? https : http;
-
-    const doRequest = (url) => {
-      client.get(url, (res) => {
-        if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
-          doRequest(res.headers.location);
-        } else {
-          const stream = fs.createWriteStream(tempPath);
-          res.pipe(stream);
-          stream.on('finish', resolve);
-          stream.on('error', reject);
-        }
-      }).on('error', reject);
-    };
-
-    doRequest(attachmentUrl);
+  // Download using fetch (handles redirects properly)
+  const response = await fetch(attachmentUrl, {
+    redirect: 'follow',
   });
 
+  if (!response.ok) {
+    throw new Error(`Failed to download attachment: ${response.status} ${response.statusText}`);
+  }
+
+  const buffer = Buffer.from(await response.arrayBuffer());
+  fs.writeFileSync(tempPath, buffer);
+
+  // Verify we actually got data
+  if (buffer.length === 0) {
+    fs.unlinkSync(tempPath);
+    throw new Error('Downloaded file is empty (0 bytes)');
+  }
+
+  // Upload to Catbox
   let catboxUrl;
   try {
     catboxUrl = await uploadFile(tempPath);
@@ -78,4 +56,4 @@ async function uploadFromDiscord(attachmentUrl) {
   return catboxUrl;
 }
 
-module.exports = { uploadFromURL, uploadFile, uploadFromDiscord };
+module.exports = { uploadFile, uploadFromDiscord };

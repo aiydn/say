@@ -50,6 +50,8 @@ module.exports = {
     const memberRoles = interaction.member.roles.cache.map((r) => r.id);
     if (!isAllowed(interaction.guild.id, personaName, interaction.user.id, memberRoles)) {
       return interaction.reply({
+       content: `Volgens mij denkt <@${interaction.user.id}> grappig te zijn, maar de persona **${personaName}** is niet toegankelijk voor <@${interaction.user.id}>!`,
+
         content: `❌ You don't have permission to use the persona **${personaName}**.`,
         ephemeral: true,
       });

@@ -127,9 +127,9 @@ module.exports = {
       try {
         updates.avatar = await uploadFromDiscord(avatarAttachment.url);
       } catch (error) {
-        console.error('Catbox upload error:', error);
+        console.error('uploader upload error:', error);
         return interaction.editReply({
-          content: '❌ Failed to upload avatar to Catbox. Please try again.',
+          content: '❌ Failed to upload avatar to uploader. Please try again.',
         });
       }
     }

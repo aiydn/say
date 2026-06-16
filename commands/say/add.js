@@ -78,16 +78,16 @@ module.exports = {
       });
     }
 
-    // Upload to Catbox
+    // Upload to uploader
     await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
-    let catboxUrl;
+    let uploaderUrl;
     try {
-      catboxUrl = await uploadFromDiscord(avatarAttachment.url);
+      uploaderUrl = await uploadFromDiscord(avatarAttachment.url);
     } catch (error) {
-      console.error('Catbox upload error:', error);
+      console.error('uploader upload error:', error);
       return interaction.editReply({
-        content: '❌ Failed to upload avatar to Catbox. Please try again.',
+        content: '❌ Failed to upload avatar to uploader. Please try again.',
       });
     }
 
@@ -111,13 +111,13 @@ module.exports = {
       interaction.user.id,
       personaName,
       displayName,
-      catboxUrl,
+      uploaderUrl,
       allowedUsers,
       allowedRoles
     );
 
     await interaction.editReply({
-      content: `✅ Persona **${personaName}** saved! (displays as **${displayName}**)\nAvatar: ${catboxUrl}`,
+      content: `✅ Persona **${personaName}** saved! (displays as **${displayName}**)\nAvatar: ${uploaderUrl}`,
     });
   },
 };

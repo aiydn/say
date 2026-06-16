@@ -1,5 +1,5 @@
 const { addPersona, getPersona } = require('../../utils/personaManager');
-const { uploadFromDiscord } = require('../../utils/catbox');
+const { uploadFromDiscord } = require('../../utils/uploader');
 const { isValidAvatar } = require('../../utils/validateAvatar');
 const { SlashCommandBuilder, MessageFlags } = require('discord.js');
 

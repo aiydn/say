@@ -1,3 +1,4 @@
+const fetch = require('node-fetch');
 const FormData = require('form-data');
 const fs = require('fs');
 const path = require('path');
@@ -5,28 +6,6 @@ const https = require('https');
 const http = require('http');
 
 const API_URL = 'https://catbox.moe/user/api.php';
-
-/**
- * Make a multipart/form-data POST to Catbox.
- * Returns the response body as text (the catbox URL on success).
- */
-function postForm(form) {
-  return new Promise((resolve, reject) => {
-    form.submit(API_URL, (err, res) => {
-      if (err) return reject(err);
-
-      let body = '';
-      res.on('data', (chunk) => (body += chunk));
-      res.on('end', () => {
-        if (res.statusCode === 200 && body.trim().startsWith('https://')) {
-          resolve(body.trim());
-        } else {
-          reject(new Error(`Catbox upload failed: ${body.trim()}`));
-        }
-      });
-    });
-  });
-}
 
 /**
  * Upload a local file to Catbox.
@@ -37,7 +16,19 @@ async function uploadFile(filePath) {
   form.append('reqtype', 'fileupload');
   form.append('fileToUpload', fs.createReadStream(filePath));
 
-  return postForm(form);
+  const res = await fetch(API_URL, {
+    method: 'POST',
+    body: form,
+    headers: form.getHeaders(),
+  });
+
+  const text = await res.text();
+
+  if (res.ok && text.trim().startsWith('https://')) {
+    return text.trim();
+  }
+
+  throw new Error(`Catbox upload failed: ${text.trim()}`);
 }
 
 /**
@@ -49,7 +40,19 @@ async function uploadURL(url) {
   form.append('reqtype', 'urlupload');
   form.append('url', url);
 
-  return postForm(form);
+  const res = await fetch(API_URL, {
+    method: 'POST',
+    body: form,
+    headers: form.getHeaders(),
+  });
+
+  const text = await res.text();
+
+  if (res.ok && text.trim().startsWith('https://')) {
+    return text.trim();
+  }
+
+  throw new Error(`Catbox URL upload failed: ${text.trim()}`);
 }
 
 /**
@@ -64,7 +67,7 @@ async function uploadFromDiscord(attachmentUrl) {
 
   const tempPath = path.join(dataDir, `temp_${Date.now()}`);
 
-  // Download Discord attachment
+  // Download Discord attachment to temp file
   await new Promise((resolve, reject) => {
     const client = attachmentUrl.startsWith('https') ? https : http;
 
@@ -89,7 +92,6 @@ async function uploadFromDiscord(attachmentUrl) {
   try {
     catboxUrl = await uploadFile(tempPath);
   } finally {
-    // Always clean up
     if (fs.existsSync(tempPath)) {
       fs.unlinkSync(tempPath);
     }

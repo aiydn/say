@@ -133,11 +133,25 @@ function removeAllowedRole(guildId, personaName, roleId) {
   return data.personas[k];
 }
 
+function modifyPersona(guildId, personaName, updates) {
+  const data = load(guildId);
+  const k = key(personaName);
+  if (!data.personas[k]) return null;
+
+  if (updates.displayName) data.personas[k].displayName = updates.displayName;
+  if (updates.avatar) data.personas[k].avatar = updates.avatar;
+
+  save(guildId, data);
+  return data.personas[k];
+}
+
+
 module.exports = {
   addPersona,
   getPersona,
   listPersonas,
   deletePersona,
+  modifyPersona, 
   setWebhook,
   isAllowed,
   addAllowedUser,

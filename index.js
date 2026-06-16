@@ -32,12 +32,24 @@ for (const folder of commandFolders) {
 }
 
 client.on(Events.InteractionCreate, async (interaction) => {
-	if (!interaction.isChatInputCommand()) return;
-	const command = interaction.client.commands.get(interaction.commandName);
-	if (!command) {
-		console.error(`No command matching ${interaction.commandName} was found.`);
-		return;
-	}
+  // ── Autocomplete ──
+  if (interaction.isAutocomplete()) {
+    const command = client.commands.get(interaction.commandName);
+    if (!command?.autocomplete) return;
+
+    try {
+      await command.autocomplete(interaction);
+    } catch (error) {
+      console.error('Autocomplete error:', error);
+    }
+    return;
+  }
+
+  // ── Slash commands ──
+  if (!interaction.isChatInputCommand()) return;
+
+  const command = client.commands.get(interaction.commandName);
+  if (!command) return;
 	try {
 		await command.execute(interaction);
 	} catch (error) {

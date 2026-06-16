@@ -1,4 +1,3 @@
-const { SlashCommandBuilder } = require('discord.js');
 const config = require('../../config.json');
 const {
   getPersona,

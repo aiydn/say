@@ -5,8 +5,8 @@ const { SlashCommandBuilder, MessageFlags } = require('discord.js');
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName('add')
-    .setDescription('Save a new persona for use with /say')
+    .setName('persona add')
+    .setDescription('Save a new persona for use with /persona say')
     .addStringOption((option) =>
       option
         .setName('name')

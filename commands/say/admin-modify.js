@@ -15,8 +15,8 @@ const { SlashCommandBuilder, MessageFlags } = require('discord.js');
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName('admin-modify')
-    .setDescription('Modify or delete any persona')
+    .setName('persona admin')
+    .setDescription('admin stuff')
     .addStringOption((option) =>
       option
         .setName('persona')

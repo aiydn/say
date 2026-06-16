@@ -4,7 +4,7 @@ const { getPersona, setWebhook, isAllowed } = require('../../utils/personaManage
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('say')
-    .setDescription('Send a message via webhook')
+    .setDescription('Send a message as a persona')
     .addStringOption((option) =>
       option
         .setName('persona')

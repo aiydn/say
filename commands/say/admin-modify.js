@@ -1,9 +1,9 @@
 const { SlashCommandBuilder } = require('discord.js');
+const config = require('../../config.json');
 const {
   getPersona,
   modifyPersona,
   deletePersona,
-  isAllowed,
   addAllowedUser,
   removeAllowedUser,
   addAllowedRole,
@@ -12,10 +12,11 @@ const {
 const { uploadFromDiscord } = require('../../utils/catbox');
 const { isValidAvatar } = require('../../utils/validateAvatar');
 
+
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName('modify')
-    .setDescription('Modify or delete a saved persona')
+    .setName('admin-modify')
+    .setDescription('Modify or delete any persona')
     .addStringOption((option) =>
       option
         .setName('persona')
@@ -67,20 +68,19 @@ module.exports = {
     ),
 
   async execute(interaction) {
+    if (interaction.user.id !== config.ownerId) {
+      return interaction.reply({
+        content: `Volgens mij denkt <@${interaction.user.id}> grappig te zijn, MAAR DAT IS DUS NIET ZO😭`,
+        ephemeral: true,
+      });
+    }
+
     const personaName = interaction.options.getString('persona');
     const persona = getPersona(interaction.guild.id, personaName);
 
     if (!persona) {
       return interaction.reply({
         content: `❌ No persona named **${personaName}** found.`,
-        ephemeral: true,
-      });
-    }
-
-    const memberRoles = interaction.member.roles.cache.map((r) => r.id);
-    if (!isAllowed(interaction.guild.id, personaName, interaction.user.id, memberRoles)) {
-      return interaction.reply({
-        content: `❌ You don't have permission to modify **${personaName}**.`,
         ephemeral: true,
       });
     }
@@ -171,16 +171,11 @@ module.exports = {
   },
 
   async autocomplete(interaction) {
-    const { listPersonas, isAllowed } = require('../utils/personaManager');
+    const { listPersonas } = require('../utils/personaManager');
     const focused = interaction.options.getFocused();
-    const memberRoles = interaction.member.roles.cache.map((r) => r.id);
 
     const personas = listPersonas(interaction.guild.id);
-
-    const choices = personas
-      .filter((p) => isAllowed(interaction.guild.id, p.personaName, interaction.user.id, memberRoles))
-      .map((p) => ({ name: p.personaName, value: p.personaName }));
-
+    const choices = personas.map((p) => ({ name: p.personaName, value: p.personaName }));
     const filtered = choices.filter((c) =>
       c.name.toLowerCase().startsWith(focused.toLowerCase())
     );

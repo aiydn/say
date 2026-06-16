@@ -101,7 +101,7 @@ module.exports = {
   },
 
   async autocomplete(interaction) {
-    const { listPersonas, isAllowed } = require('../utils/personaManager');
+    const { listPersonas, isAllowed } = require('../../utils/personaManager');
     const focused = interaction.options.getFocused();
     const memberRoles = interaction.member.roles.cache.map((r) => r.id);
 

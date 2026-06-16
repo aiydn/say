@@ -1,5 +1,7 @@
 const { SlashCommandBuilder } = require('discord.js');
 const { addPersona, getPersona } = require('../../utils/personaManager');
+const { uploadFromDiscord } = require('../../utils/catbox');
+const { isValidAvatar } = require('../../utils/validateAvatar');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -17,10 +19,10 @@ module.exports = {
         .setDescription('Display name shown as the webhook username')
         .setRequired(true)
     )
-    .addStringOption((option) =>
+    .addAttachmentOption((option) =>
       option
         .setName('avatar')
-        .setDescription('Avatar URL for this persona')
+        .setDescription('Upload an avatar image (PNG, JPEG, GIF, or WebP)')
         .setRequired(true)
     )
     .addUserOption((option) =>
@@ -57,7 +59,7 @@ module.exports = {
   async execute(interaction) {
     const personaName = interaction.options.getString('name');
     const displayName = interaction.options.getString('displayname');
-    const avatar = interaction.options.getString('avatar');
+    const avatarAttachment = interaction.options.getAttachment('avatar');
 
     // Uniqueness check
     const existing = getPersona(interaction.guild.id, personaName);
@@ -68,12 +70,24 @@ module.exports = {
       });
     }
 
-    try {
-      new URL(avatar);
-    } catch {
+    // Image-only check
+    if (!isValidAvatar(avatarAttachment)) {
       return interaction.reply({
-        content: '❌ That doesn\'t look like a valid URL.',
+        content: '❌ Avatar must be an image file (PNG, JPEG, GIF, or WebP).',
         ephemeral: true,
+      });
+    }
+
+    // Upload to Catbox
+    await interaction.deferReply({ ephemeral: true });
+
+    let catboxUrl;
+    try {
+      catboxUrl = await uploadFromDiscord(avatarAttachment.url);
+    } catch (error) {
+      console.error('Catbox upload error:', error);
+      return interaction.editReply({
+        content: '❌ Failed to upload avatar to Catbox. Please try again.',
       });
     }
 
@@ -92,33 +106,18 @@ module.exports = {
       .filter(Boolean)
       .map((r) => r.id);
 
-    const persona = addPersona(
+    addPersona(
       interaction.guild.id,
       interaction.user.id,
       personaName,
       displayName,
-      avatar,
+      catboxUrl,
       allowedUsers,
       allowedRoles
     );
 
-    const userMentions = persona.allowedUsers
-      .map((id) => `<@${id}>`)
-      .join(', ');
-    const roleMentions = persona.allowedRoles
-      .map((id) => `<@&${id}>`)
-      .join(', ');
-
-    const accessLine = [
-      userMentions ? `Users: ${userMentions}` : null,
-      roleMentions ? `Roles: ${roleMentions}` : null,
-    ]
-      .filter(Boolean)
-      .join(' | ');
-
-    await interaction.reply({
-      content: `✅ Persona **${personaName}** saved! (displays as **${displayName}**)\nAccess: ${accessLine}`,
-      ephemeral: true,
+    await interaction.editReply({
+      content: `✅ Persona **${personaName}** saved! (displays as **${displayName}**)\nAvatar: ${catboxUrl}`,
     });
   },
 };

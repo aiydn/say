@@ -11,6 +11,7 @@ const {
 } = require('../../utils/personaManager');
 const { uploadFromDiscord } = require('../../utils/catbox');
 const { isValidAvatar } = require('../../utils/validateAvatar');
+const { SlashCommandBuilder, MessageFlags } = require('discord.js');
 
 
 module.exports = {
@@ -105,7 +106,7 @@ module.exports = {
     }
 
     // ── Modify mode ──
-    await interaction.deferReply({ ephemeral: true });
+    await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
     const newDisplayName = interaction.options.getString('displayname');
     const avatarAttachment = interaction.options.getAttachment('avatar');

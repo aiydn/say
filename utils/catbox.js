@@ -7,10 +7,11 @@ const path = require('path');
 const catbox = new Catbox();
 
 /**
- * Upload a file from a URL to Catbox (re-hosts it).
+ * Upload a file from a URL to Catbox (Catbox re-hosts it).
+ * This is the simplest approach — Catbox downloads it directly.
  * Returns the catbox URL, e.g. "https://files.catbox.moe/abc123.png"
  */
-async function urlUpload(url) {
+async function uploadFromURL(url) {
   const response = await catbox.uploadURL({ url });
   return response;
 }
@@ -19,16 +20,26 @@ async function urlUpload(url) {
  * Upload a local file to Catbox.
  * Returns the catbox URL.
  */
-async function fileUpload(filePath) {
+async function uploadFile(filePath) {
   const response = await catbox.uploadFile({ path: filePath });
   return response;
 }
 
 /**
  * Download a Discord attachment to a temp file, then upload to Catbox.
+ * Falls back to uploadURL if file upload fails.
  * Returns the catbox URL.
  */
 async function uploadFromDiscord(attachmentUrl) {
+  // Try the URL method first — Catbox downloads it itself, no temp file needed
+  try {
+    const url = await uploadFromURL(attachmentUrl);
+    return url;
+  } catch (error) {
+    console.log('URL upload failed, trying file upload fallback:', error.message);
+  }
+
+  // Fallback: download to temp file then upload
   const dataDir = path.join(__dirname, '..', 'data');
   if (!fs.existsSync(dataDir)) {
     fs.mkdirSync(dataDir, { recursive: true });
@@ -36,7 +47,6 @@ async function uploadFromDiscord(attachmentUrl) {
 
   const tempPath = path.join(dataDir, `temp_${Date.now()}`);
 
-  // Download Discord attachment to temp file
   await new Promise((resolve, reject) => {
     const client = attachmentUrl.startsWith('https') ? https : http;
 
@@ -56,12 +66,10 @@ async function uploadFromDiscord(attachmentUrl) {
     doRequest(attachmentUrl);
   });
 
-  // Upload to Catbox
   let catboxUrl;
   try {
-    catboxUrl = await fileUpload(tempPath);
+    catboxUrl = await uploadFile(tempPath);
   } finally {
-    // Always clean up temp file
     if (fs.existsSync(tempPath)) {
       fs.unlinkSync(tempPath);
     }
@@ -70,4 +78,4 @@ async function uploadFromDiscord(attachmentUrl) {
   return catboxUrl;
 }
 
-module.exports = { urlUpload, fileUpload, uploadFromDiscord };
+module.exports = { uploadFromURL, uploadFile, uploadFromDiscord };

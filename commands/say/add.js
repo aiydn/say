@@ -2,6 +2,7 @@ const { SlashCommandBuilder } = require('discord.js');
 const { addPersona, getPersona } = require('../../utils/personaManager');
 const { uploadFromDiscord } = require('../../utils/catbox');
 const { isValidAvatar } = require('../../utils/validateAvatar');
+const { SlashCommandBuilder, MessageFlags } = require('discord.js');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -79,7 +80,7 @@ module.exports = {
     }
 
     // Upload to Catbox
-    await interaction.deferReply({ ephemeral: true });
+    await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
     let catboxUrl;
     try {

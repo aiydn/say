@@ -55,7 +55,7 @@ module.exports = {
       });
     }
 
-    await interaction.deferReply({ ephemeral: true });
+    await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
     const name = persona.displayName;
     const avatar = persona.avatar;

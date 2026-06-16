@@ -101,13 +101,16 @@ module.exports = {
   },
 
   async autocomplete(interaction) {
-    const { listPersonas, isAllowed } = require('../../utils/personaManager');
-    const focused = interaction.options.getFocused();
+    const focusedOption = interaction.options.getFocused(true);
+
+    if (focusedOption.name !== 'persona') return;
+
+    const { listPersonas, isAllowed } = require('../utils/personaManager');
     const memberRoles = interaction.member.roles.cache.map((r) => r.id);
+    const focused = focusedOption.value;
 
     const personas = listPersonas(interaction.guild.id);
 
-    // Only show personas the user has access to
     const choices = personas
       .filter((p) => isAllowed(interaction.guild.id, p.personaName, interaction.user.id, memberRoles))
       .map((p) => ({ name: p.personaName, value: p.personaName }));
@@ -118,4 +121,5 @@ module.exports = {
 
     await interaction.respond(filtered.slice(0, 25));
   },
+
 };

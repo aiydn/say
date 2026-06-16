@@ -172,9 +172,14 @@ module.exports = {
   },
 
   async autocomplete(interaction) {
+    const focusedOption = interaction.options.getFocused(true);
+
+    // Only provide autocomplete for the persona option
+    if (focusedOption.name !== 'persona') return;
+
     const { listPersonas, isAllowed } = require('../utils/personaManager');
-    const focused = interaction.options.getFocused();
     const memberRoles = interaction.member.roles.cache.map((r) => r.id);
+    const focused = focusedOption.value;
 
     const personas = listPersonas(interaction.guild.id);
 

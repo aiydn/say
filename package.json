@@ -1,0 +1,27 @@
+{
+  "name": "say",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/aiydn/say#readme",
+  "bugs": {
+    "url": "https://github.com/aiydn/say/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aiydn/say.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "discord.js": "^14.26.4"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.5.0"
+  }
+}

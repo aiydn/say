@@ -61,11 +61,20 @@ module.exports = {
     const displayName = interaction.options.getString('displayname');
     const avatarAttachment = interaction.options.getAttachment('avatar');
 
-    // Uniqueness check
-    const existing = getPersona(interaction.guild.id, personaName);
-    if (existing) {
+    // Uniqueness check (personaName)
+    const existingpersonaName = getPersona(interaction.guild.id, personaName);
+    if (existingpersonaName) {
       return interaction.reply({
-        content: `❌ A persona named **${personaName}** already exists. Use \`/modify\` to change it, or choose a different name.`,
+        content: `❌ Persona met de personaName **${personaName}** bestaat al. Gebruik een andere personaName.`,
+        ephemeral: true,
+      });
+    }
+
+    // Uniqueness check (displayName)
+    const existingdisplayName = getPersona(interaction.guild.id, displayName);
+    if (existingdisplayName) {
+      return interaction.reply({
+        content: `❌ Persona met de displayName **${displayName}** bestaat al. Gebruik een andere displayName.`,
         ephemeral: true,
       });
     }
@@ -73,7 +82,7 @@ module.exports = {
     // Image-only check
     if (!isValidAvatar(avatarAttachment)) {
       return interaction.reply({
-        content: '❌ Avatar must be an image file (PNG, JPEG, GIF, or WebP).',
+        content: '❌ Avatar moet wel een afbeelding zijn natuurlijk (PNG, JPEG, GIF, or WebP).',
         ephemeral: true,
       });
     }
@@ -87,7 +96,7 @@ module.exports = {
     } catch (error) {
       console.error('uploader upload error:', error);
       return interaction.editReply({
-        content: '❌ Failed to upload avatar to uploader. Please try again.',
+        content: '❌ Avatar uploader is mislukt',
       });
     }
 
@@ -117,7 +126,7 @@ module.exports = {
     );
 
     await interaction.editReply({
-      content: `✅ Persona **${personaName}** saved! (displays as **${displayName}**)\nAvatar: ${uploaderUrl}`,
+      content: `✅Gelukt!\nGebruik \`/persona_say persona:${personaName}\` om berichten te sturen als **${displayName}**)\n (avatar url: ${uploaderUrl})`,
     });
   },
 };

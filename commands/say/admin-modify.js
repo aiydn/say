@@ -70,7 +70,7 @@ module.exports = {
   async execute(interaction) {
     if (interaction.user.id !== config.ownerId) {
       return interaction.reply({
-        content: `Volgens mij denkt <@${interaction.user.id}> grappig te zijn, MAAR DAT IS DUS NIET ZO😭`,
+        content: `Volgens mij denkt <@${interaction.user.id}> grappig te zijn, MAAR DAT IS DUS NIET ZO 😭`,
         ephemeral: true,
       });
     }
@@ -80,7 +80,7 @@ module.exports = {
 
     if (!persona) {
       return interaction.reply({
-        content: `❌ No persona named **${personaName}** found.`,
+        content: `❌ Geen persona met de naam **${personaName}** gevonden.`,
         ephemeral: true,
       });
     }
@@ -99,7 +99,7 @@ module.exports = {
       }
 
       return interaction.reply({
-        content: `🗑️ Persona **${personaName}** deleted along with all its webhooks.`,
+        content: `🗑️ Persona **${personaName}** is verwijderd.`,
         ephemeral: true,
       });
     }
@@ -115,13 +115,19 @@ module.exports = {
     const removeRole = interaction.options.getRole('removerole');
 
     const updates = {};
-
+    if (existingdisplayName = getPersona(interaction.guild.id, displayname))
+      if (existingdisplayName) {
+      return interaction.reply({
+        content: `❌ Er bestaat al een persona met de personaName **${displayName}** bestaat al`,
+        ephemeral: true,
+      });
+    }
     if (newDisplayName) updates.displayName = newDisplayName;
 
     if (avatarAttachment) {
       if (!isValidAvatar(avatarAttachment)) {
         return interaction.editReply({
-          content: '❌ Avatar must be an image file (PNG, JPEG, GIF, or WebP).',
+        content: '❌ Avatar moet wel een afbeelding zijn natuurlijk (PNG, JPEG, GIF, or WebP).',
         });
       }
       try {
@@ -129,7 +135,7 @@ module.exports = {
       } catch (error) {
         console.error('uploader upload error:', error);
         return interaction.editReply({
-          content: '❌ Failed to upload avatar to uploader. Please try again.',
+        content: '❌ Avatar uploaden is mislukt, Probeer opnieuw.',
         });
       }
     }
@@ -149,7 +155,7 @@ module.exports = {
       !addUser && !removeUser && !addRole && !removeRole
     ) {
       return interaction.editReply({
-        content: '❌ Nothing to change. Provide at least one option to modify.',
+        content: '❌ Er valt zo niets te veranderen. Geeft aan wat je wil veranderen.',
       });
     }
 

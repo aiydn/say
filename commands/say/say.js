@@ -32,7 +32,7 @@ module.exports = {
 
     if (!text && !attachment) {
       return interaction.reply({
-        content: '❌ You must provide either text or an attachment.',
+        content: `❌ Geef aan wat **${displayName}** moet zeggen`,
         ephemeral: true,
       });
     }
@@ -41,7 +41,7 @@ module.exports = {
 
     if (!persona) {
       return interaction.reply({
-        content: `❌ Persona **${personaName}** not found. Create it with \`/add\`.`,
+        content: `❌ Persona **${personaName}** bestaat nog niet. Voeg toe met \`/persona_add\`.`,
         ephemeral: true,
       });
     }
@@ -50,9 +50,7 @@ module.exports = {
     const memberRoles = interaction.member.roles.cache.map((r) => r.id);
     if (!isAllowed(interaction.guild.id, personaName, interaction.user.id, memberRoles)) {
       return interaction.reply({
-       content: `Volgens mij denkt <@${interaction.user.id}> grappig te zijn, maar de persona **${personaName}** is niet toegankelijk voor <@${interaction.user.id}>!`,
-
-        content: `❌ You don't have permission to use the persona **${personaName}**.`,
+        content: `Volgens mij denkt <@${interaction.user.id}> grappig te zijn, maar de persona **${personaName}** is niet toegankelijk voor <@${interaction.user.id}>!`,
         ephemeral: true,
       });
     }
@@ -98,7 +96,7 @@ module.exports = {
     await webhook.send(sendOptions);
 
     await interaction.editReply({
-      content: `✅ Message sent as **${name}** in <#${channelId}>`,
+      content: `✅ Bericht verstuurd als **${name}** in <#${channelId}>`,
     });
   },
 

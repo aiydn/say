@@ -117,7 +117,7 @@ module.exports = {
 
     const updates = {};
     // Uniqueness check (displayName)
-    const existingdisplayName = getPersona(interaction.guild.id, displayName);
+    const existingdisplayName = getPersona(interaction.guild.id, newDisplayName);
     if (existingdisplayName) {
       return interaction.reply({
         content: `❌ Er bestaat al een persona met de personaName **${displayName}**!`,

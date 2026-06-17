@@ -120,7 +120,7 @@ module.exports = {
     const existingdisplayName = getPersona(interaction.guild.id, newDisplayName);
     if (existingdisplayName) {
       return interaction.reply({
-        content: `❌ Er bestaat al een persona met de personaName **${displayName}**!`,
+        content: `❌ Er bestaat al een persona met de personaName **${newDisplayName}**!`,
         ephemeral: true,
       });
     }

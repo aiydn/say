@@ -119,12 +119,12 @@ module.exports = {
     // Uniqueness check (displayName)
     const existingdisplayName = getPersona(interaction.guild.id, newDisplayName);
     if (existingdisplayName) {
-      return interaction.reply({
-        content: `❌ Er bestaat al een persona met de personaName **${newDisplayName}**!`,
-        ephemeral: true,
-      });
+      // return interaction.reply({
+      //   content: `❌ Er bestaat al een persona met de personaName **${newDisplayName}**!`,
+      //   ephemeral: true,
+      // });
     }
-    if (newDisplayName) updates.displayName = newDisplayName;
+    else if (newDisplayName) updates.displayName = newDisplayName;
 
     if (avatarAttachment) {
       if (!isValidAvatar(avatarAttachment)) {

@@ -70,14 +70,14 @@ module.exports = {
       });
     }
 
-    // Uniqueness check (displayName)
-    const existingdisplayName = getPersona(interaction.guild.id, displayName);
-    if (existingdisplayName) {
-      return interaction.reply({
-        content: `❌ Persona met de displayName **${displayName}** bestaat al. Gebruik een andere displayName.`,
-        ephemeral: true,
-      });
-    }
+    // // Uniqueness check (displayName)
+    // const existingdisplayName = getPersona(interaction.guild.id, displayName);
+    // if (existingdisplayName) {
+    //   return interaction.reply({
+    //     content: `❌ Persona met de displayName **${displayName}** bestaat al. Gebruik een andere displayName.`,
+    //     ephemeral: true,
+    //   });
+    // }
 
     // Image-only check
     if (!isValidAvatar(avatarAttachment)) {

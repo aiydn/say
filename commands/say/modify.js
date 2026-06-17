@@ -117,14 +117,14 @@ module.exports = {
 
     const updates = {};
     // Uniqueness check (displayName)
-    const existingdisplayName = getPersona(interaction.guild.id, newDisplayName);
-    if (existingdisplayName) {
+    // const existingdisplayName = getPersona(interaction.guild.id, newDisplayName);
+    // if (existingdisplayName) {
       // return interaction.reply({
       //   content: `❌ Er bestaat al een persona met de personaName **${newDisplayName}**!`,
       //   ephemeral: true,
       // });
-    }
-    else if (newDisplayName) updates.displayName = newDisplayName;
+    // }
+    if (newDisplayName) updates.displayName = newDisplayName;
 
     if (avatarAttachment) {
       if (!isValidAvatar(avatarAttachment)) {

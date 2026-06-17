@@ -115,10 +115,11 @@ module.exports = {
     const removeRole = interaction.options.getRole('removerole');
 
     const updates = {};
-    if (existingdisplayName = getPersona(interaction.guild.id, displayname))
-      if (existingdisplayName) {
+    // Uniqueness check (displayName)
+    const existingdisplayName = getPersona(interaction.guild.id, displayName);
+    if (existingdisplayName) {
       return interaction.reply({
-        content: `❌ Er bestaat al een persona met de personaName **${displayName}** bestaat al`,
+        content: `❌ Er bestaat al een persona met de personaName **${displayName}**!`,
         ephemeral: true,
       });
     }
@@ -127,7 +128,7 @@ module.exports = {
     if (avatarAttachment) {
       if (!isValidAvatar(avatarAttachment)) {
         return interaction.editReply({
-        content: '❌ Avatar moet wel een afbeelding zijn natuurlijk (PNG, JPEG, GIF, or WebP).',
+          content: '❌ Avatar moet wel een afbeelding zijn natuurlijk (PNG, JPEG, GIF, or WebP).',
         });
       }
       try {
@@ -135,7 +136,7 @@ module.exports = {
       } catch (error) {
         console.error('uploader upload error:', error);
         return interaction.editReply({
-        content: '❌ Avatar uploaden is mislukt, Probeer opnieuw.',
+          content: '❌ Avatar uploaden is mislukt, Probeer opnieuw.',
         });
       }
     }
